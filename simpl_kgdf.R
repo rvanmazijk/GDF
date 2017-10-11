@@ -133,46 +133,65 @@ kGDF <- function(k = 1,
         # Meaning that the k perturbed data points are selected in every pass
         # from the complete dataset, possibly leaving out a few
         for (i in 1:pass) {
-            # Perturbation
-            y2 <- y # perturb copy of y
-            to.perturb <- sample(n, size = k, replace = FALSE)
-            if (distr == "normal")
-                y2[to.perturb] <- y2[to.perturb] + rnorm(k, 0, noise)
-            if (distr == "binary")
-                y2[to.perturb] <- !y2[to.perturb]
-            assign("y2", y2, envir = .GlobalEnv) # for model update needed, apparently
 
-            # accommodate model with perturbed data
+            # Perturbation
+            y2 <- y  # Perturb copy of y
+            to.perturb <- sample(n, size = k, replace = FALSE)
+            if (distr == "normal") {
+                y2[to.perturb] <- y2[to.perturb] + rnorm(k, 0, noise)
+            }
+            if (distr == "binary") {
+                y2[to.perturb] <- !y2[to.perturb]
+            }
+
+            # For model update needed, apparently
+            assign("y2", y2, envir = .GlobalEnv)
+
+            # Accommodate model with perturbed data
             if (mod == "GLM" |
                 mod == "GAM" |
-                mod == "ANN")
+                mod == "ANN") {
                 fm.updated <- update(fm, y2 ~ ., data = data)
+            }
             if (mod == "rF" &
-                distr == "normal")
+                distr == "normal") {
                 update(fm, y2 ~ ., data = data)
+            }
             if (mod == "rF" &
-                distr == "binary")
+                distr == "binary") {
                 update(fm, as.factor(y2) ~ ., data = data)
-            if (mod == "BRT")
+            }
+            if (mod == "BRT") {
                 fm.updated <- update(fm, as.formula(y2 ~ .), data = data)
+            }
 
-            # store intermediates
+            # Store intermediates
             ye[, i] <- y2
             if (mod == "rF") {
-                if (fm$type == "regression")
+                if (fm$type == "regression") {
                     yehat[, i] <- predict(fm.updated, type = "response")
-                if (fm$type == "classification")
+                }
+                if (fm$type == "classification") {
                     yehat[, i] <- predict(fm.updated, type = "prob")[, 2]
+                }
             }
-            if (mod == "ANN")
+            if (mod == "ANN") {
                 yehat[, i] <- predict(fm.updated, type = "raw")
+            }
             if (mod == "GLM" |
-                mod == "GAM")
+                mod == "GAM") {
                 yehat[, i] <- predict(fm.updated, type = "response")
-            if (mod == "BRT")
-                yehat[, i <- predict(fm.updated, type = "response", n.trees = perf)]
+            }
+            if (mod == "BRT") {
+                yehat[, i <- predict(
+                    fm.updated,
+                    type = "response",
+                    n.trees = perf
+                )]
+            }
 
             rm(y2, envir = .GlobalEnv)
+
         }
     }
 

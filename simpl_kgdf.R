@@ -181,12 +181,20 @@ kGDF <- function(k = 1,
     yehat <- as.matrix(yehat)
     #Fit a LR to yehat[i,] vs ye[,i]
     fm.LR <-
-        lapply(seq_along(ye[, 1]), function(x)
-            lm(yehat[x, ] ~ ye[x, ]))
+        lapply(
+            seq_along(ye[, 1]),
+            function(x) lm(yehat[x, ] ~ ye[x, ])
+        )
     #Calculate sum of slopes m[i] as GDF
     GDF.hor <-
-        sum(sapply(fm.LR, function(i)
-            coefficients(i)[2]), na.rm = T)
+        sum(
+            sapply(
+                fm.LR,
+                function(i) coefficients(i)[2]
+            ),
+            na.rm = TRUE
+        )
 
     return(GDF.hor)
+
 }

@@ -13,7 +13,9 @@ kGDF <- function(k = 1,
     n <- length(y)
 
     # Set noise
-    if (distr == "normal") noise <- noise * sd(y)
+    if (distr == "normal") {
+        noise <- noise * sd(y)
+    }
 
     # dataframes for ye and yehat
     ye <- yehat <- data.frame(rep(NA, n))
@@ -21,7 +23,7 @@ kGDF <- function(k = 1,
     if (method == "jackknife") {
         # Jack-knife makes sure that each data point is perturbed per pass
 
-        # loop to re-run Model until each data point has been perturbed
+        # loop to re-run model until each data point has been perturbed
         i <- 1  # subscription
         for (t in 1:pass) {
 
